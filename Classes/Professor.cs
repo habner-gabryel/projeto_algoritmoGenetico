@@ -1,7 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace API_REST_aux_horarios_grade.Classes
+namespace projeto_algoritmoGenetico.Classes
 {
     [Table("tb_professor")]
     public class Professor
@@ -13,5 +14,7 @@ namespace API_REST_aux_horarios_grade.Classes
         [Display(Name = "NomeProfessor")]
         [Column("nome")]
         public string Nome { get; set; }
+
+        public List<HorarioProfessor> HorariosProfessor { get; set; }
     }
 }

@@ -1,9 +1,6 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using API_REST_aux_horarios_grade.Classes;
 using MySql.Data.MySqlClient;
 using projeto_algoritmoGenetico.Classes;
 
@@ -22,25 +19,47 @@ namespace projeto_algoritmoGenetico.DAO
         {
             List<Professor> professores = new List<Professor>();
             try { 
-
-
                 if (conexao != null)
                 {
-
                     var query = conexao.Query();
                     query.CommandText =
                         " SELECT " +
-                        "   p.id_professor, " +
-                        "   p.nome " +
-                        " FROM tb_professor p ";
+                        "   x.id_professor, " +
+                        "   x.nome " +
+                        " FROM tb_professor x ";
                     
-                    MySqlDataReader reader = query.ExecuteReader();
+                    MySqlDataReader reader1 = query.ExecuteReader();
 
-                    while(reader.Read())
+
+                    while(reader1.Read())
                     {
+                        query.CommandText = 
+                            " select " +
+                            "   x.id_horario_professor, " +
+                            "   x.id_horario, " +
+                            "   x.id_professor " +
+                            " from tb_horario_professor x " +
+                            " where " +
+                            "   x.id_professor = @id_professor ";
+                        query.Parameters.AddWithValue("@id_professor", reader1.GetInt32("id_professor"));
+
+                        MySqlDataReader reader2 = query.ExecuteReader();
+
+                        List<HorarioProfessor> horProf = new();
+
+                        while(reader2.Read()) {
+                            horProf.Add(new HorarioProfessor()
+                            {
+                                IdHorarioProfessor = reader2.GetInt32("id_horario_professor"),
+                                IdHorario = reader2.GetInt32("id_horario"),
+                                IdProfessor = reader2.GetInt32("id_professor")
+                            });
+                        }
+
                         professores.Add(new Professor() { 
-                            IdProfessor = reader.GetInt32("id_professor"),
-                            Nome = reader.GetString("nome")
+                            IdProfessor = reader1.GetInt32("id_professor"),
+                            Nome = reader1.GetString("nome"),
+                            HorariosProfessor = horProf
                         });
                     }
                 }
@@ -54,7 +73,6 @@ namespace projeto_algoritmoGenetico.DAO
             {
                 conexao.Close();
             }
-
             return professores;
         }
 
