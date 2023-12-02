@@ -8,9 +8,9 @@ namespace projeto_algoritmoGenetico.DAO
 {
     internal interface IDAO<T>
     {
-        T GetByID(int id);
+        public T GetByID(int id);
 
-        List<T> GetAll();
+        public List<T> GetAll();
 
     }
 }

@@ -1,22 +1,24 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Windows.Documents;
 
 namespace projeto_algoritmoGenetico.Classes
 {
-    [Table("tb_horario")]
     public class Horario
     {
-        [Display(Name = "IdHorario")]
-        [Column("id_horario")]
         public int IdHorario { get; set; }
 
-        [Display(Name = "DiaSemana")]
-        [Column("dia_semana")]
+
         public int DiaSemana { get; set; }
 
-        [Display(Name = "Horario")]
-        [Column("horario")]
         public string HorarioD { get; set;}
 
+        public TimeSpan HorarioInicio {  get; set; }
+
+        public TimeSpan HorarioFim { get; set; }
+
+        public List<HorarioDisciplina> HorarioDisciplinas { get; set; }
     }
 }
