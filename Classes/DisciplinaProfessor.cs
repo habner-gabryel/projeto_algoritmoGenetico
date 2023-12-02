@@ -10,5 +10,9 @@ namespace projeto_algoritmoGenetico.Classes
         public int IdDisciplina {  get; set; }
 
         public int IdProfessor { get; set; }
+
+        public Disciplina Disciplina { get; set; }
+
+        public Professor Professor { get; set; }
     }
 }

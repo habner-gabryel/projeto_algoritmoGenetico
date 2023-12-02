@@ -145,9 +145,50 @@ namespace projeto_algoritmoGenetico.DAO
             }
         }
 
-        Horario IDAO<Horario>.GetByID(int id)
+        public Horario GetByID(int id)
         {
-            throw new NotImplementedException();
+            Horario horario = new Horario();
+            try
+            {
+
+                if (conexao != null)
+                {
+                    var query = conexao.Query();
+                    query.CommandText =
+                        " SELECT " +
+                        "   x.id_horario, " +
+                        "   x.dia_semana," +
+                        "   x.horario " +
+                        " FROM tb_horario x " +
+                        " WHERE " +
+                        "   x.id_horario = @id_horario";
+                    query.Parameters.AddWithValue("@id_horario", id);
+
+                    MySqlDataReader reader = query.ExecuteReader();
+
+                    while (reader.Read())
+                    {
+                        horario = new Horario()
+                        {
+                            IdHorario = reader.GetInt32("id_horario"),
+                            DiaSemana = reader.GetInt32("dia_semana"),
+                            HorarioD = reader.GetString("horario"),
+                            HorarioInicio = valorHorarioInicio(reader.GetString("horario")),
+                            HorarioFim = valorHorarioFim(reader.GetString("horario"))
+                        };
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message, ex);
+            }
+            finally
+            {
+                conexao.Close();
+            }
+            return horario;
         }
     }
 }

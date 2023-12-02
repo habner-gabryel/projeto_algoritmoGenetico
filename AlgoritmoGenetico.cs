@@ -3,25 +3,47 @@ using projeto_algoritmoGenetico.DAO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace projeto_algoritmoGenetico
 {
     public class AlgoritmoGenetico
     {
+        private List<Professor> Professores;
+
+        private List<Horario> Horarios;
+
+        public AlgoritmoGenetico()
+        {
+            Professores = new ProfessorDAO().GetAll();
+
+            Horarios = new HorarioDAO().GetAll();
+        }
+
         public int CalcularAptidao(Horario horario)
         {
-            int aptidao = 0;
-           
-            for (int i = 0; i < horario.HorarioDisciplinas.Count - 1; i++)
+            int conflitos = 0, aptidao = 0, compactacao = 0;
+            for (int i = 0; i < horario.HorarioDisciplinas.Count; i++)
             {
-                int diferenca = Math.Abs(horario.HorarioInicio - horario.HorarioFim);
-
-                aptidao += diferenca;
+                for (int j = i + 1; j < horario.HorarioDisciplinas.Count; j++)
+                {
+                    if ((horario.HorarioDisciplinas[i].DisciplinaProfessor == horario.HorarioDisciplinas[j].DisciplinaProfessor).Any())
+                    {
+                        if (horario.HorarioDisciplinas[i].IdHorario == horario.HorarioDisciplinas[j].IdHorario)
+                        {
+                            conflitos++;
+                        }
+                    }
+                }
             }
 
-           
+            for (int i = 0; i < Professores.Count; i++)
+            {
+                int inicio = horario.HorarioDisciplinas.Where(a => a.DisciplinaProfessor.IdProfessor == Professores[i].IdProfessor).Min(a => (int)new HorarioDAO().GetByID(a.IdHorario).HorarioInicio.TotalMinutes);
+                int fim = horario.HorarioDisciplinas.Where(a => a.DisciplinaProfessor.IdProfessor == Professores[i].IdProfessor).Max(a => (int) new HorarioDAO().GetByID(a.IdHorario).HorarioFim.TotalMinutes);
+                compactacao += fim - inicio;
+            }
+
+            aptidao = 10 * conflitos + 5 + 2 * compactacao;
 
             return aptidao;
         }
