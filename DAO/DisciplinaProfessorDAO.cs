@@ -64,10 +64,9 @@ namespace projeto_algoritmoGenetico.DAO
 
         public DisciplinaProfessor DPById(int idDisciplinaProfessor, int idDisciplina, int idProfessor)
         {
+            DisciplinaProfessor dp = new DisciplinaProfessor();
             try
             {
-                DisciplinaProfessor dp = new DisciplinaProfessor();
-
                 if (conexao != null)
                 {
                     var query = conexao.Query();
@@ -107,7 +106,7 @@ namespace projeto_algoritmoGenetico.DAO
                 conexao.Close();
             }
 
-            return new DisciplinaProfessor();
+            return dp;
         }
     }
 }

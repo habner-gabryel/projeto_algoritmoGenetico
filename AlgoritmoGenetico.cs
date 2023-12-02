@@ -12,6 +12,7 @@ namespace projeto_algoritmoGenetico
 
         private List<Horario> Horarios;
 
+        private Random random = new Random();
         public AlgoritmoGenetico()
         {
             Professores = new ProfessorDAO().GetAll();
@@ -21,12 +22,12 @@ namespace projeto_algoritmoGenetico
 
         public int CalcularAptidao(Horario horario)
         {
-            int conflitos = 0, aptidao = 0, compactacao = 0;
+            int conflitos = 0, compactacao = 0;
             for (int i = 0; i < horario.HorarioDisciplinas.Count; i++)
             {
                 for (int j = i + 1; j < horario.HorarioDisciplinas.Count; j++)
                 {
-                    if ((horario.HorarioDisciplinas[i].DisciplinaProfessor == horario.HorarioDisciplinas[j].DisciplinaProfessor).Any())
+                    if (horario.HorarioDisciplinas[i].DisciplinaProfessor.IdProfessor == horario.HorarioDisciplinas[j].DisciplinaProfessor.IdProfessor)
                     {
                         if (horario.HorarioDisciplinas[i].IdHorario == horario.HorarioDisciplinas[j].IdHorario)
                         {
@@ -43,23 +44,21 @@ namespace projeto_algoritmoGenetico
                 compactacao += fim - inicio;
             }
 
-            aptidao = 10 * conflitos + 5 + 2 * compactacao;
-
-            return aptidao;
+            return (10 * conflitos + 5 + 2 * compactacao);
         }
 
-        public List<Horario> Selecao(List<Horario> populacao)
+        public List<Horario> Selecao()
         {
             List<Horario> selecionados = new List<Horario>();
-            Random random = new Random();
 
-            while (selecionados.Count < populacao.Count)
+
+            while (selecionados.Count < Horarios.Count)
             {
-                int indice1 = random.Next(populacao.Count);
-                int indice2 = random.Next(populacao.Count);
+                int indice1 = random.Next(Horarios.Count);
+                int indice2 = random.Next(Horarios.Count);
 
-                Horario individuo1 = populacao[indice1];
-                Horario individuo2 = populacao[indice2];
+                Horario individuo1 = Horarios[indice1];
+                Horario individuo2 = Horarios[indice2];
 
                 Horario vencedor = CalcularAptidao(individuo1) < CalcularAptidao(individuo2) ? individuo1 : individuo2;
 
@@ -71,7 +70,7 @@ namespace projeto_algoritmoGenetico
 
         public Horario Cruzamento(Horario pai, Horario mae)
         {
-            Random random = new Random();
+
             int pontoCorte = random.Next(pai.HorarioDisciplinas.Count);
 
             List<HorarioDisciplina> aulasFilho = pai.HorarioDisciplinas.Take(pontoCorte).ToList();
@@ -82,7 +81,6 @@ namespace projeto_algoritmoGenetico
 
         public void Mutacao(Horario horario)
         {
-            Random random = new Random();
 
             double probabilidadeMutacao = 0.1;
 
@@ -101,12 +99,8 @@ namespace projeto_algoritmoGenetico
         }
 
         private Horario NovoHorarioAleatorio()
-        {
-            List<Horario> horarios = new HorarioDAO().GetAll();
-            Random random = new Random();
-            int indice = random.Next(horarios.Count);
-
-            return horarios[indice];
+        { 
+            return Horarios[random.Next(Horarios.Count)];
         }
     }
 }
