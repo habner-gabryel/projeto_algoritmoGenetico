@@ -77,17 +77,37 @@ namespace projeto_algoritmoGenetico.DAO
             return relatorios;
         }
 
-        public void InsertRegistroExecucao(BigInteger tempo)
+        public RegistroExecucao InsertRegistroExecucao(BigInteger tempo)
         {
+            RegistroExecucao registro = new RegistroExecucao();
             try
             {
                 if(conexao != null)
                 {
                     var query = conexao.Query();
-                    query.CommandText = " INSERT INTO tb_registro_execucao (tempo_execucao) VALUES (CAST(@tempo AS UNSIGNED))";
+                    query.CommandText = " INSERT INTO tb_registro_execucao (tempo_execucao) VALUES (CAST(@tempo AS UNSIGNED)) ";
                     query.Parameters.AddWithValue("@tempo", tempo.ToString());
 
                     var result = query.ExecuteNonQuery();
+
+                    query.CommandText =
+                        " SELECT " +
+                        "   x.id_id_registro_execucao, " +
+                        "   x.tempo_execucao " +
+                        " FROM tb_registro_execucao x " +
+                        " ORDER BY " +
+                        "   id_registro_ececucao DESC " +
+                        " LIMIT 1 ";
+
+                    MySqlDataReader reader = query.ExecuteReader();
+
+                    while (reader.Read())
+                    {
+                        registro = new RegistroExecucao() {
+                            IdRegistroExecucao = reader.GetInt32("id_registro_execucao"),
+                            TempoExecucao = reader.GetInt64("tempo_execucao")
+                        }; 
+                    }
                 }
             } 
             catch (Exception ex)
@@ -98,9 +118,10 @@ namespace projeto_algoritmoGenetico.DAO
             {
                 conexao.Close();
             }
+            return registro;
         }
 
-        public void InsertRegistroHorarios(RegistroHorario registro)
+        public void InsertRegistroHorarios(RegistroExecucao registro, int IdDisciplinaProfessor)
         {
             try
             {
@@ -108,7 +129,7 @@ namespace projeto_algoritmoGenetico.DAO
                 {
                     var query = conexao.Query();
                     query.CommandText = " INSERT INTO tb_registro_horarios (id_disciplina_professor, id_registro_execucao) VALUES (@id_disciplina_professor, @id_registro_execucao)";
-                    query.Parameters.AddWithValue("@id_disciplina_professor", registro.IdDisciplinaProfessor);
+                    query.Parameters.AddWithValue("@id_disciplina_professor", IdDisciplinaProfessor);
                     query.Parameters.AddWithValue("@id_registro_execucao", registro.IdRegistroExecucao);
 
                     var result = query.ExecuteNonQuery();

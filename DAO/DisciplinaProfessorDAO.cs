@@ -9,11 +9,11 @@ using System.Threading.Tasks;
 
 namespace projeto_algoritmoGenetico.DAO
 {
-    internal class DisciplinaProfessorDAO : IDAO<DisciplinaProfessor>
+    class DisciplinaProfessorDAO : IDAO<DisciplinaProfessor>
     {
         private Conexao conexao;
 
-        DisciplinaProfessorDAO()
+        public DisciplinaProfessorDAO()
         {
             conexao = new Conexao();   
         }
@@ -77,12 +77,22 @@ namespace projeto_algoritmoGenetico.DAO
                         "   x.id_professor " +
                         " FROM tb_disciplina_professor x " +
                         " WHERE" +
-                        "   (x.id_disciplina_professor = @id_disciplina_professor " +
-                        "   OR x.id_disciplina = @id_disciplina " +
-                        "   OR x.id_professor = @id_professor ";
-                    query.Parameters.AddWithValue("@id_disciplina_professor", idDisciplinaProfessor);
-                    query.Parameters.AddWithValue("@id_disciplina", idDisciplina);
-                    query.Parameters.AddWithValue("@id_professor", idProfessor);
+                        "   1=1 ";
+                    if(idDisciplina != -99999)
+                    {
+                        query.CommandText += " AND x.id_disciplina = @id_disciplina ";
+                        query.Parameters.AddWithValue("@id_disciplina", idDisciplina);
+                    }
+                    if(idDisciplinaProfessor != -99999)
+                    {
+                        query.CommandText += " AND x.id_disciplina_professor = @id_disciplina_professor ";
+                        query.Parameters.AddWithValue("@id_disciplina_professor", idDisciplinaProfessor);
+                    }
+                    if(idProfessor != -99999)
+                    {
+                        query.CommandText += " AND x.id_professor = @id_professor ";
+                        query.Parameters.AddWithValue("@id_professor", idProfessor);
+                    }
 
                     MySqlDataReader reader1 = query.ExecuteReader();
 
