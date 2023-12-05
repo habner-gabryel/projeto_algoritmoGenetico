@@ -96,7 +96,7 @@ namespace projeto_algoritmoGenetico.DAO
                     conexao.AbreConexao();
 
                     var query = conexao.Query();
-                    query.CommandText = " INSERT INTO tb_registro_execucao (id_registro_execucao, tempo_execucao, aptidao) VALUES (DEFAULT, @tempo, @aptidao) ";
+                    query.CommandText = " INSERT INTO tb_registro_execucao (tempo_execucao, aptidao) VALUES (@tempo, @aptidao) ";
                     query.Parameters.AddWithValue("@tempo", tempo);
                     query.Parameters.AddWithValue("@aptidao", aptidao);
 
@@ -111,7 +111,7 @@ namespace projeto_algoritmoGenetico.DAO
                             "   x.aptidao " +
                             " FROM tb_registro_execucao x " +
                             " ORDER BY " +
-                            "   id_registro_execucao DESC " +
+                            "   x.id_registro_execucao DESC " +
                             " LIMIT 1 ";
 
                         MySqlDataReader reader = query.ExecuteReader();
@@ -125,7 +125,6 @@ namespace projeto_algoritmoGenetico.DAO
                             }; 
                         }
                     }
-
                 }
             } 
             catch (Exception ex)
