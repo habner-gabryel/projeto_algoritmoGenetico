@@ -14,5 +14,9 @@ namespace projeto_algoritmoGenetico.Classes
 
         public int IdDisciplinaProfessor { get; set; }
 
+        public int IdHorarioDisciplina { get; set; }
+
+        public int IdHorario {  get; set; }
+
     }
 }

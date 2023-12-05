@@ -13,6 +13,8 @@ namespace projeto_algoritmoGenetico.Classes
 
         public BigInteger TempoExecucao { get; set; }
 
+        public Double Aptidao { get; set; }
+
         public List<RegistroHorario> RegistroHorarios { get; set; }
 
     }

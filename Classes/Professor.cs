@@ -9,7 +9,5 @@ namespace projeto_algoritmoGenetico.Classes
         public int IdProfessor {  get; set; }
 
         public string Nome { get; set; }
-
-        public List<HorarioProfessor> HorariosProfessor { get; set; }
     }
 }

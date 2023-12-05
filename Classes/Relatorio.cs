@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Numerics;
 
 namespace projeto_algoritmoGenetico.Classes
@@ -8,6 +9,8 @@ namespace projeto_algoritmoGenetico.Classes
         public int IdRegistroExecucao { get; set; }
 
         public BigInteger TempoExecucao { get; set; }
+
+        public Double Aptidao { get; set; }
 
         public List<RegistroHorario> RegistroHorarios { get; set; }
     }

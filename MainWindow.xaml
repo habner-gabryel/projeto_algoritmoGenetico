@@ -1,12 +1,12 @@
 ﻿<Window x:Class="projeto_algoritmoGenetico.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:projeto_algoritmoGenetico"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
+        Title="Seu Aplicativo WPF" Height="350" Width="525">
 
+    <Grid>
+        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+            <Button Content="Executar" Click="Executar_Click" Margin="25,0,25,25"/>
+            <Button Content="Baixar Excel" Click="GerarArquivo_Click" Margin="25,0,25,25"/>
+        </StackPanel>
     </Grid>
 </Window>

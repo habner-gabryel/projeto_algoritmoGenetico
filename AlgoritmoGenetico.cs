@@ -9,20 +9,49 @@ namespace projeto_algoritmoGenetico
 {
     public class AlgoritmoGenetico
     {
-        private List<Professor> Professores;
+        private readonly List<Professor> Professores;
 
         private List<Horario> Horarios;
 
-        Stopwatch stopwatch;
+        private Double AptidaoTotal;
 
-        private Random random = new Random();
+        readonly Stopwatch stopwatch;
+
+        private readonly Random random = new();
         public AlgoritmoGenetico()
         {
             Professores = new ProfessorDAO().GetAll();
 
             Horarios = new HorarioDAO().GetAll();
 
-            stopwatch = new Stopwatch();
+            stopwatch = new();
+        }
+
+        public List<Horario> ProxGeracao()
+        {
+            stopwatch.Start();
+
+            foreach(Horario horario in Horarios)
+            {
+                List<DisciplinaProfessor> dp = new DisciplinaProfessorDAO().GetAll();
+
+                horario.HorarioDisciplinas = new();
+
+                for (int i = 0; i <= 6; i++) { 
+                    DisciplinaProfessor tmpDp = dp[random.Next(dp.Count)];
+
+                    horario.HorarioDisciplinas.Add(
+                        new()
+                        {
+                            IdDisciplina = tmpDp.IdDisciplina,
+                            IdHorario = horario.IdHorario,
+                            DisciplinaProfessor = tmpDp,
+                        }
+                    );
+                }
+            }
+
+            return Horarios;
         }
 
         public int CalcularAptidao(Horario horario)
@@ -44,19 +73,27 @@ namespace projeto_algoritmoGenetico
 
             for (int i = 0; i < Professores.Count; i++)
             {
-                int inicio = horario.HorarioDisciplinas.Where(a => a.DisciplinaProfessor.IdProfessor == Professores[i].IdProfessor).Min(a => (int)new HorarioDAO().GetByID(a.IdHorario).HorarioInicio.TotalMinutes);
-                int fim = horario.HorarioDisciplinas.Where(a => a.DisciplinaProfessor.IdProfessor == Professores[i].IdProfessor).Max(a => (int) new HorarioDAO().GetByID(a.IdHorario).HorarioFim.TotalMinutes);
+                HorarioDisciplina tmpHD = horario.HorarioDisciplinas.FirstOrDefault(a => a.DisciplinaProfessor.IdProfessor == Professores[i].IdProfessor);
+
+                int inicio = 0, fim = 0;
+
+                if(tmpHD != null)
+                {
+                    inicio = (int) horario.HorarioInicio.TotalMinutes;
+                    fim = (int) horario.HorarioFim.TotalMinutes;
+                }
+
                 compactacao += fim - inicio;
             }
+
+            AptidaoTotal += (10 * conflitos + 5 + 2 * compactacao);
 
             return (10 * conflitos + 5 + 2 * compactacao);
         }
 
         public List<Horario> Selecao()
         {
-            stopwatch.Start();
-
-            List<Horario> selecionados = new List<Horario>();
+            List<Horario> selecionados = new();
 
             while (selecionados.Count < Horarios.Count)
             {
@@ -73,19 +110,18 @@ namespace projeto_algoritmoGenetico
 
             try
             {
-                registrarExecucao();
+                RegistrarExecucao();
                 return selecionados;
 
             } catch (Exception ex)
             {
-                throw new Exception(ex.Message, ex);
+                throw new(ex.Message, ex);
             }
 
         }
 
         public Horario Cruzamento(Horario pai, Horario mae)
         {
-
             int pontoCorte = random.Next(pai.HorarioDisciplinas.Count);
 
             List<HorarioDisciplina> aulasFilho = pai.HorarioDisciplinas.Take(pontoCorte).ToList();
@@ -118,15 +154,12 @@ namespace projeto_algoritmoGenetico
             return Horarios[random.Next(Horarios.Count)];
         }
 
-        public void GerarProximaGeracao(List<Horario> populacao)
+        public void GerarProximaGeracao()
         {
-            List<Horario> proximaGeracao = new List<Horario>();
-
-            Horarios = populacao;
+            List<Horario> proximaGeracao = ProxGeracao();
 
             List<Horario> paisSelecionados = Selecao();
 
-            // Aplica crossover para gerar descendentes
             for (int i = 0; i < paisSelecionados.Count; i += 2)
             {
                 Horario pai = paisSelecionados[i];
@@ -144,32 +177,31 @@ namespace projeto_algoritmoGenetico
         }
 
 
-        public void registrarExecucao()
+        public void RegistrarExecucao()
         {
             try
             {
-                RelatorioDAO rel = new RelatorioDAO();
-                HorarioDisciplinaDAO hdDAO = new HorarioDisciplinaDAO();
-                DisciplinaProfessorDAO dpDAO = new DisciplinaProfessorDAO();
+                RelatorioDAO rel = new();
+                HorarioDisciplinaDAO hdDAO = new();
+                DisciplinaProfessorDAO dpDAO = new();
                 
                 stopwatch.Stop();
-                RegistroExecucao registro = rel.InsertRegistroExecucao(stopwatch.ElapsedMilliseconds);
+                RegistroExecucao registro = rel.InsertRegistroExecucao(stopwatch.ElapsedMilliseconds, AptidaoTotal);
 
                 foreach(Horario horario in Horarios)
                 {
                     foreach (HorarioDisciplina horDisc in horario.HorarioDisciplinas)
                     {
-                        hdDAO.InsertHorarioDisciplina(horDisc);
+                        HorarioDisciplina hd = hdDAO.InsertHorarioDisciplina(horDisc);
 
                         DisciplinaProfessor dp = dpDAO.DPById( -99999, horDisc.IdDisciplina, -99999);
 
-                        rel.InsertRegistroHorarios(new RegistroExecucao() { IdRegistroExecucao = registro.IdRegistroExecucao }, dp.IdDisciplinaProfessor );
-
+                        rel.InsertRegistroHorarios(registro, dp.IdDisciplinaProfessor, hd.IdHorarioDisciplina);
                     }
                 }
             } catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                throw new(ex.Message);
             }
         }
 

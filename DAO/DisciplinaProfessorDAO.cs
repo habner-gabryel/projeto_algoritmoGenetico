@@ -11,19 +11,21 @@ namespace projeto_algoritmoGenetico.DAO
 {
     class DisciplinaProfessorDAO : IDAO<DisciplinaProfessor>
     {
-        private Conexao conexao;
+        private readonly Conexao conexao;
 
         public DisciplinaProfessorDAO()
         {
-            conexao = new Conexao();   
+            conexao = new();   
         }
         public List<DisciplinaProfessor> GetAll()
         {
-            List<DisciplinaProfessor> dp = new List<DisciplinaProfessor>();
+            List<DisciplinaProfessor> dp = new();
             try
             {
                 if (conexao != null)
                 {
+                    conexao.AbreConexao();
+
                     var query = conexao.Query();
                     query.CommandText =
                         " SELECT " +
@@ -36,7 +38,7 @@ namespace projeto_algoritmoGenetico.DAO
 
                     while (reader1.Read())
                     {
-                        dp.Add(new DisciplinaProfessor()
+                        dp.Add(new()
                         {
                             IdDisciplinaProfessor = reader1.GetInt32("id_disciplina_professor"),
                             IdDisciplina = reader1.GetInt32("id_disciplina"),
@@ -48,7 +50,7 @@ namespace projeto_algoritmoGenetico.DAO
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message, ex);
+                throw new(ex.Message, ex);
             }
             finally
             {
@@ -64,11 +66,13 @@ namespace projeto_algoritmoGenetico.DAO
 
         public DisciplinaProfessor DPById(int idDisciplinaProfessor, int idDisciplina, int idProfessor)
         {
-            DisciplinaProfessor dp = new DisciplinaProfessor();
+            DisciplinaProfessor dp = new();
             try
             {
                 if (conexao != null)
                 {
+                    conexao.AbreConexao();
+
                     var query = conexao.Query();
                     query.CommandText =
                         " SELECT " +
@@ -98,7 +102,7 @@ namespace projeto_algoritmoGenetico.DAO
 
                     while (reader1.Read())
                     {
-                        dp = new DisciplinaProfessor()
+                        dp = new()
                         {
                             IdDisciplinaProfessor = reader1.GetInt32("id_disciplina_professor"),
                             IdDisciplina = reader1.GetInt32("id_disciplina"),
@@ -109,7 +113,7 @@ namespace projeto_algoritmoGenetico.DAO
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message, ex);
+                throw new(ex.Message, ex);
             }
             finally
             {

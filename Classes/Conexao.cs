@@ -4,11 +4,11 @@ using System.Data;
 
 public class Conexao
 {
-    public static string Host = "localhost";
-    public static int Port = 3306;
-    public static string Database = "bd_proj_alggenetico";
-    public static string Username = "root";
-    public static string Password = "123123";
+    private static readonly string Host = "localhost";
+    private static readonly int Port = 3306;
+    private static readonly string Database = "bd_proj_alggenetico";
+    private static readonly string Username = "root";
+    private static readonly string Password = "123123";
 
     private static MySqlConnection connection;
 
@@ -18,7 +18,7 @@ public class Conexao
     {
         try
         {
-            connection = new MySqlConnection($"server={Host};database={Database};port={Port};user={Username};password={Password}");
+            connection = new($"server={Host};database={Database};port={Port};user={Username};password={Password}");
             connection.Open();
 
         } catch (MySqlException)
@@ -26,6 +26,14 @@ public class Conexao
             throw;
         }
 
+    }
+
+    public void AbreConexao()
+    {
+        if (connection.State == ConnectionState.Closed)
+        {
+            connection.Open();
+        }
     }
 
     public void Close()

@@ -15,16 +15,18 @@ namespace projeto_algoritmoGenetico.DAO
 
         public DisciplinaDAO()
         {
-            conexao = new Conexao();
+            conexao = new();
         }
 
         public List<Disciplina> GetAll()
         {
-            List<Disciplina> disciplinas = new List<Disciplina>();
+            List<Disciplina> disciplinas = new();
             try
             {
                 if (conexao != null)
                 {
+                    conexao.AbreConexao();
+
                     var query = conexao.Query();
                     query.CommandText =
                         " SELECT " +
@@ -53,7 +55,7 @@ namespace projeto_algoritmoGenetico.DAO
 
                         while (reader2.Read())
                         {
-                            horDisc.Add(new HorarioDisciplina()
+                            horDisc.Add(new()
                             {
                                 IdHorarioDisciplina = reader2.GetInt32("id_horario_disciplina"),
                                 IdHorario = reader2.GetInt32("id_horario"),
@@ -77,7 +79,7 @@ namespace projeto_algoritmoGenetico.DAO
 
                         while (reader2.Read())
                         {
-                            dpDisc.Add(new DependenciaDisciplina()
+                            dpDisc.Add(new()
                             {
                                IdDependenciaDisciplina = reader2.GetInt32("id_dependencia_disciplina"),
                                IdDisciplinaDependente = reader2.GetInt32("id_disciplina_dependente"),
@@ -85,7 +87,7 @@ namespace projeto_algoritmoGenetico.DAO
                             });
                         }
 
-                        disciplinas.Add(new Disciplina()
+                        disciplinas.Add(new()
                         {
                             IdDisciplina = reader1.GetInt32("id_disciplina"),
                             Nome = reader1.GetString("nome"),
@@ -98,7 +100,7 @@ namespace projeto_algoritmoGenetico.DAO
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message, ex);
+                throw new(ex.Message, ex);
             }
             finally
             {
@@ -109,7 +111,44 @@ namespace projeto_algoritmoGenetico.DAO
 
         public Disciplina GetByID(int id)
         {
-            throw new NotImplementedException();
+            Disciplina disciplina = new();
+            try
+            {
+                if (conexao != null)
+                {
+                    conexao.AbreConexao();
+
+                    var query = conexao.Query();
+                    query.CommandText =
+                        " SELECT " +
+                        "   x.id_disciplina, " +
+                        "   x.nome " +
+                        " FROM tb_disciplina x " +
+                        " WHERE " +
+                        "   x.id_disciplina = @id_disciplina";
+                    query.Parameters.AddWithValue("@id_disciplina", id);
+
+                    MySqlDataReader reader = query.ExecuteReader();
+
+                    while (reader.Read())
+                    {
+                        disciplina = new()
+                        {
+                            IdDisciplina = reader.GetInt32("id_disciplina"),
+                            Nome = reader.GetString("nome")
+                        };
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new(ex.Message, ex);
+            }
+            finally
+            {
+                conexao.Close();
+            }
+            return disciplina;
         }
     }
 }

@@ -12,15 +12,17 @@ namespace projeto_algoritmoGenetico.DAO
 
         public ProfessorDAO()
         {
-           conexao = new Conexao();
+           conexao = new();
         }
 
         public List<Professor> GetAll()
         {
-            List<Professor> professores = new List<Professor>();
+            List<Professor> professores = new();
             try { 
                 if (conexao != null)
                 {
+                    conexao.AbreConexao();
+
                     var query = conexao.Query();
                     query.CommandText =
                         " SELECT " +
@@ -33,33 +35,9 @@ namespace projeto_algoritmoGenetico.DAO
 
                     while(reader1.Read())
                     {
-                        query.CommandText = 
-                            " select " +
-                            "   x.id_horario_professor, " +
-                            "   x.id_horario, " +
-                            "   x.id_professor " +
-                            " from tb_horario_professor x " +
-                            " where " +
-                            "   x.id_professor = @id_professor ";
-                        query.Parameters.AddWithValue("@id_professor", reader1.GetInt32("id_professor"));
-
-                        MySqlDataReader reader2 = query.ExecuteReader();
-
-                        List<HorarioProfessor> horProf = new();
-
-                        while(reader2.Read()) {
-                            horProf.Add(new HorarioProfessor()
-                            {
-                                IdHorarioProfessor = reader2.GetInt32("id_horario_professor"),
-                                IdHorario = reader2.GetInt32("id_horario"),
-                                IdProfessor = reader2.GetInt32("id_professor")
-                            });
-                        }
-
-                        professores.Add(new Professor() { 
+                        professores.Add(new() { 
                             IdProfessor = reader1.GetInt32("id_professor"),
-                            Nome = reader1.GetString("nome"),
-                            HorariosProfessor = horProf
+                            Nome = reader1.GetString("nome")
                         });
                     }
                 }
@@ -67,7 +45,7 @@ namespace projeto_algoritmoGenetico.DAO
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message, ex);
+                throw new(ex.Message, ex);
             }
             finally
             {
@@ -78,7 +56,44 @@ namespace projeto_algoritmoGenetico.DAO
 
         public Professor GetByID(int id)
         {
-            throw new NotImplementedException();
+            Professor professor = new();
+            try
+            {
+                if (conexao != null)
+                {
+                    conexao.AbreConexao();
+
+                    var query = conexao.Query();
+                    query.CommandText =
+                        " SELECT " +
+                        "   x.id_professor, " +
+                        "   x.nome " +
+                        " FROM tb_professor x " +
+                        " WHERE " +
+                        "   x.id_professor = @id_professor";
+                    query.Parameters.AddWithValue("@id_professor", id);
+
+                    MySqlDataReader reader = query.ExecuteReader();
+
+                    while (reader.Read())
+                    {
+                        professor = new()
+                        {
+                            IdProfessor = reader.GetInt32("id_professor"),
+                            Nome = reader.GetString("nome")
+                        };
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new(ex.Message, ex);
+            }
+            finally
+            {
+                conexao.Close();
+            }
+            return professor;
         }
     }
 }
