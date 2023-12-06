@@ -34,9 +34,14 @@ namespace projeto_algoritmoGenetico.DAO
 
                     MySqlDataReader reader1 = query.ExecuteReader();
 
+                    Conexao conexao2 = new Conexao();
+                    conexao2.AbreConexao();
+
+                    var query2 = conexao2.Query();
+
                     while (reader1.Read())
                     {
-                        query.CommandText =
+                        query2.CommandText =
                             " SELECT " +
                             "   x.id_registro_horarios, " +
                             "   x.id_registro_execucao, " +
@@ -47,9 +52,10 @@ namespace projeto_algoritmoGenetico.DAO
                             "   INNER JOIN tb_horario_disciplina hd ON (hd.id_horario_disciplina = x.id_horario_disciplina) " +
                             " WHERE" +
                             "   x.id_registro_execucao = @id_registro_execucao";
-                        query.Parameters.AddWithValue("@id_registro_execucao", reader1.GetInt32("id_registro_execucao"));
+                        query2.Parameters.Clear();
+                        query2.Parameters.AddWithValue("@id_registro_execucao", reader1.GetInt32("id_registro_execucao"));
 
-                        MySqlDataReader reader2 = query.ExecuteReader();
+                        MySqlDataReader reader2 = query2.ExecuteReader();
 
                         List<RegistroHorario> registros = new();
 
@@ -64,6 +70,8 @@ namespace projeto_algoritmoGenetico.DAO
                                 IdHorario = reader2.GetInt32("id_horario")
                             });
                         }
+
+                        reader2.Close();
 
                         relatorios.Add(new Relatorio()
                         {
@@ -96,13 +104,14 @@ namespace projeto_algoritmoGenetico.DAO
                     conexao.AbreConexao();
 
                     var query = conexao.Query();
-                    query.CommandText = " INSERT INTO tb_registro_execucao (tempo_execucao, aptidao) VALUES (@tempo, @aptidao) ";
+                    query.CommandText = " INSERT INTO tb_registro_execucao (id_registro_execucao, tempo_execucao, aptidao) VALUES (@id_null, @tempo, @aptidao) ";
+                    query.Parameters.AddWithValue("@id_null", null);
                     query.Parameters.AddWithValue("@tempo", tempo);
                     query.Parameters.AddWithValue("@aptidao", aptidao);
 
                     var result = query.ExecuteNonQuery();
 
-                    if(result > 0)
+                    if (result > 0)
                     {
                         query.CommandText =
                             " SELECT " +
@@ -118,11 +127,12 @@ namespace projeto_algoritmoGenetico.DAO
 
                         while (reader.Read())
                         {
-                            registro = new() {
+                            registro = new()
+                            {
                                 IdRegistroExecucao = reader.GetInt32("id_registro_execucao"),
                                 TempoExecucao = reader.GetInt64("tempo_execucao"),
                                 Aptidao = reader.GetDouble("aptidao")
-                            }; 
+                            };
                         }
                     }
                 }
@@ -147,7 +157,8 @@ namespace projeto_algoritmoGenetico.DAO
                     conexao.AbreConexao();
 
                     var query = conexao.Query();
-                    query.CommandText = " INSERT INTO tb_registro_horarios (id_disciplina_professor, id_horario_disciplina, id_registro_execucao) VALUES (@id_disciplina_professor, @id_registro_execucao)";
+                    query.CommandText = " INSERT INTO tb_registro_horarios (id_registro_horarios ,id_disciplina_professor, id_horario_disciplina, id_registro_execucao) VALUES (@id_null ,@id_disciplina_professor, @id_horario_disciplina, @id_registro_execucao)";
+                    query.Parameters.AddWithValue("@id_null", null);
                     query.Parameters.AddWithValue("@id_disciplina_professor", IdDisciplinaProfessor);
                     query.Parameters.AddWithValue("@id_horario_disciplina", IdHorarioDisciplina);
                     query.Parameters.AddWithValue("@id_registro_execucao", registro.IdRegistroExecucao);

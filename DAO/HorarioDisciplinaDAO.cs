@@ -28,7 +28,7 @@ namespace projeto_algoritmoGenetico.DAO
             throw new NotImplementedException();
         }
 
-        public HorarioDisciplina InsertHorarioDisciplina(HorarioDisciplina hd)
+        public HorarioDisciplina InsertHorarioDisciplina(HorarioDisciplina hd, int IdRegistroExecucao)
         {
             HorarioDisciplina horarioDisciplina = new();
 
@@ -39,9 +39,11 @@ namespace projeto_algoritmoGenetico.DAO
                     conexao.AbreConexao();
 
                     var query = conexao.Query();
-                    query.CommandText = " INSERT INTO tb_horario_disciplina (id_horario, id_disciplina) VALUES (@id_horario, @id_disciplina) ";
+                    query.CommandText = " INSERT INTO tb_horario_disciplina (id_horario_disciplina, id_horario, id_disciplina, id_registro_execucao) VALUES (@id_null, @id_horario, @id_disciplina, @id_registro_execucao) ";
+                    query.Parameters.AddWithValue("@id_null", null);
                     query.Parameters.AddWithValue("@id_horario", hd.IdHorario);
                     query.Parameters.AddWithValue("@id_disciplina", hd.IdDisciplina);
+                    query.Parameters.AddWithValue("@id_registro_execucao", IdRegistroExecucao);
 
                     var result = query.ExecuteNonQuery();
 
@@ -54,7 +56,7 @@ namespace projeto_algoritmoGenetico.DAO
                            "   x.id_disciplina " +
                            " FROM tb_horario_disciplina x " +
                            " ORDER BY " +
-                           "   id_horario_disciplina DESC " +
+                           "   x.id_horario_disciplina DESC " +
                            " LIMIT 1 ";
 
                         MySqlDataReader reader = query.ExecuteReader();

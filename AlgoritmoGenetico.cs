@@ -135,6 +135,8 @@ namespace projeto_algoritmoGenetico
 
             double probabilidadeMutacao = 0.1;
 
+            List<int> hrToRemove = new List<int>();
+
             foreach (HorarioDisciplina aula in horario.HorarioDisciplinas)
             {
                 if (random.NextDouble() < probabilidadeMutacao)
@@ -143,8 +145,15 @@ namespace projeto_algoritmoGenetico
 
                     aula.IdHorario = newHorario.IdHorario;
 
-                    horario.HorarioDisciplinas.Remove(aula);
+                    hrToRemove.Add(horario.HorarioDisciplinas.IndexOf(aula));
                     newHorario.HorarioDisciplinas.Add(aula);
+                }
+            }
+            foreach(int index in hrToRemove)
+            {
+                if(index < horario.HorarioDisciplinas.Count)
+                {
+                    horario.HorarioDisciplinas.RemoveAt(index);
                 }
             }
         }
@@ -160,7 +169,7 @@ namespace projeto_algoritmoGenetico
 
             List<Horario> paisSelecionados = Selecao();
 
-            for (int i = 0; i < paisSelecionados.Count; i += 2)
+            for (int i = 0; i < ((paisSelecionados.Count)-1); i += 2)
             {
                 Horario pai = paisSelecionados[i];
                 Horario mae = paisSelecionados[i + 1];
@@ -192,7 +201,7 @@ namespace projeto_algoritmoGenetico
                 {
                     foreach (HorarioDisciplina horDisc in horario.HorarioDisciplinas)
                     {
-                        HorarioDisciplina hd = hdDAO.InsertHorarioDisciplina(horDisc);
+                        HorarioDisciplina hd = hdDAO.InsertHorarioDisciplina(horDisc, registro.IdRegistroExecucao);
 
                         DisciplinaProfessor dp = dpDAO.DPById( -99999, horDisc.IdDisciplina, -99999);
 

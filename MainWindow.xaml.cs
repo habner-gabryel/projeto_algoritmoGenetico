@@ -22,7 +22,7 @@ namespace projeto_algoritmoGenetico
 
         public void Executar_Click(object sender, RoutedEventArgs e)
         {
-            for (int i =0; i <= 500; i++)
+            for (int i =0; i <= 143; i++)
             {
                 AlgoritmoGenetico alg = new();
                 alg.GerarProximaGeracao();
@@ -52,6 +52,8 @@ namespace projeto_algoritmoGenetico
 
                 List<Horario> horarios = HDAO.GetAll();
                 List<Relatorio> relatorios = RelDAO.GetAll();
+
+                ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
                 using (ExcelPackage pacote = new(novoArquivo))
                 {
